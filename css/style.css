@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css?family=Gloria+Hallelujah|Permanent+Marker');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+    background: url('../images/background.png');
+}
+
+.sticker {
+    padding: 15px;
+    background-color: rgb(249, 221, 68);
+    min-width: 150px;
+    min-height: 150px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    border: 1px solid yellow;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+}
+
+.sticker:hover {
+    z-index: 1;
+}
+
+.sticker .bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 20px;
+    background-color: rgb(218, 190, 40);
+    width: 100%;
+}
+
+.sticker .bar:hover {
+    cursor: move;
+    background-color: rgb(189, 169, 65);
+}
+
+.sticker textarea {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 20px;
+    line-height: 28px;
+    background-color: transparent;
+    border: none;
+    min-width: 150px;
+    min-height: 150px;
+    padding: 3px 10px;
+}
+
+.sticker textarea:focus {
+    outline: none;
+    box-shadow: 0 0 5px 1px rgba(0,0,0,0.2) inset;
+}
