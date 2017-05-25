@@ -1,49 +1,43 @@
-document.addEventListener("DOMContentLoaded", function(event) {
+(function() {
     'user strict';
 
     var draggedElement,
-    grabPointY,
-    grabPointX;
+        onDragStart,
+        onDrag,
+        onDragEnd,
+        grabPointY,
+        grabPointX,
+        getNoteObject,
+        onAddNoteClick,
+        createNote,
+        testLocalStorage,
+        init,
+        saveNote,
+        deleteNote,
+        loadNotes,
+        addNoteImg;
 
-    var addNoteBtn = document.querySelector('.addNoteBtn');
-
-    function createNote(){
-        var stickerElement = document.createElement('div'),
-        barElement = document.createElement('div'),
-        textareaElement = document.createElement('textarea');
-
-        var notePosition = "translateX(" + Math.random() * 600 + "px) translateY(" + Math.random() * 600 + "px)";
-
-        stickerElement.classList.add('sticker');
-        barElement.classList.add('bar');
-
-        document.body.appendChild(stickerElement);
-        stickerElement.appendChild(barElement);
-        stickerElement.appendChild(textareaElement);
-        stickerElement.style.transform = notePosition;
-        stickerElement.addEventListener('mousedown', onDragStart, false);
-    }
-
-    function onDragStart(event){
+    onDragStart = function(event) {
         var boundingClientRect;
 
-        if (event.target.className.indexOf('bar') === -1){
+        if (event.target.className.indexOf('bar') === -1) {
             return;
         }
 
         draggedElement = this; //sticker element
 
         boundingClientRect = draggedElement.getBoundingClientRect();
+
         grabPointY = boundingClientRect.top - event.clientY;
         grabPointX = boundingClientRect.left - event.clientX;
     }
 
-    function onDrag(event){
-        if (!draggedElement){
+    onDrag = function(event) {
+        if (!draggedElement) {
             return;
         }
-        var posY = event.clientY  + grabPointY;
-        var posX = event.clientX  + grabPointX;
+        var posY = event.clientY + grabPointY;
+        var posX = event.clientX + grabPointX;
 
         posY = (posY < 0) ? 0 : posY;
         posX = (posX < 0) ? 0 : posX;
@@ -51,13 +45,117 @@ document.addEventListener("DOMContentLoaded", function(event) {
         draggedElement.style.transform = "translateX(" + posX + "px) translateY(" + posY + "px)";
     }
 
-    function onDragEnd(){
+    onDragEnd = function() {
         draggedElement = null;
         grabPointY = null;
         grabPointX = null;
     }
 
-    addNoteBtn.addEventListener('click', createNote);
-    document.addEventListener('mousemove', onDrag);
-    document.addEventListener('mouseup', onDragEnd);
-});
+    getNoteObject = function(el) {
+        var textarea = el.querySelector('textarea');
+        return {
+            notePosition: el.style.transform,
+            content: textarea.value,
+            id: el.id,
+        };
+    }
+
+    onAddNoteClick = function() {
+        createNote();
+    }
+
+    createNote = function(options) {
+        var stickerEl = document.createElement('div'),
+            barEl = document.createElement('div'),
+            saveBtnEl = document.createElement('button'),
+            deleteBtnEl = document.createElement('button'),
+            textareaEl = document.createElement('textarea'),
+            BOUNDARIES = 600,
+            noteConfig = options || {
+                notePosition: "translateX(" + Math.random() * BOUNDARIES + "px) translateY(" + Math.random() * BOUNDARIES + "px)",
+                content: ' ',
+                id: "sticker_" + new Date().getTime(),
+            },
+            onSave,
+            onDelete;
+
+        onSave = function() {
+            saveNote(
+                getNoteObject(stickerEl)
+            )
+        }
+
+        onDelete = function() {
+            deleteNote(
+                getNoteObject(stickerEl)
+            )
+            document.body.removeChild(stickerEl);
+        }
+
+        stickerEl.style.transform = noteConfig.notePosition;
+        stickerEl.id = noteConfig.id;
+        textareaEl.value = noteConfig.content;
+
+        stickerEl.classList.add('sticker');
+        stickerEl.addEventListener('mousedown', onDragStart);
+        barEl.classList.add('bar');
+        saveBtnEl.classList.add('saveBtn');
+        saveBtnEl.addEventListener('click', onSave);
+        deleteBtnEl.classList.add('deleteBtn');
+        deleteBtnEl.addEventListener('click', onDelete);
+        textareaEl.setAttribute("placeholder", "Make some notes!");
+
+        barEl.appendChild(saveBtnEl);
+        barEl.appendChild(deleteBtnEl);
+        stickerEl.appendChild(barEl);
+        stickerEl.appendChild(textareaEl);
+
+        document.body.appendChild(stickerEl);
+    }
+
+    testLocalStorage = function() {
+        var foo = 'foo';
+        try {
+            localStorage.setItem(foo, foo);
+            localStorage.removeItem(foo);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    init = function() {
+        if (!testLocalStorage) {
+            var message = "We are sorry but you cannot use localStorage";
+            saveNote = function() {
+                console.warn(message);
+            }
+            deleteNote = function() {
+                console.warn(message);
+            }
+        } else {
+            saveNote = function(note) {
+                localStorage.setItem(note.id, JSON.stringify(note));
+            }
+            deleteNote = function(note) {
+                localStorage.removeItem(note.id);
+            }
+            loadNotes = function() {
+                for (var i = 0; i < localStorage.length; i++) {
+                    var noteObject = JSON.parse(
+                        localStorage.getItem(
+                            localStorage.key(i)
+                        )
+                    );
+                    createNote(noteObject);
+                }
+            }
+            loadNotes();
+        }
+        addNoteImg = document.querySelector('.addNote');
+        addNoteImg.addEventListener('click', onAddNoteClick);
+        document.addEventListener('mousemove', onDrag);
+        document.addEventListener('mouseup', onDragEnd);
+    }
+    init();
+})();
