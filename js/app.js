@@ -23,9 +23,8 @@
         if (event.target.className.indexOf('bar') === -1) {
             return;
         }
-
-        draggedElement = this; //sticker element
-
+        //sticker element
+        draggedElement = this;
         boundingClientRect = draggedElement.getBoundingClientRect();
 
         grabPointY = boundingClientRect.top - event.clientY;
@@ -72,9 +71,9 @@
             textareaEl = document.createElement('textarea'),
             BOUNDARIES = 600,
             noteConfig = options || {
-                notePosition: "translateX(" + Math.random() * BOUNDARIES + "px) translateY(" + Math.random() * BOUNDARIES + "px)",
-                content: ' ',
-                id: "sticker_" + new Date().getTime(),
+                notePosition : "translateX(" + Math.random() * BOUNDARIES + "px) translateY(" + Math.random() * BOUNDARIES + "px)",
+                content : ' ',
+                id : "sticker_" + new Date().getTime(),
             },
             onSave,
             onDelete;
@@ -103,12 +102,12 @@
         saveBtnEl.addEventListener('click', onSave);
         deleteBtnEl.classList.add('deleteBtn');
         deleteBtnEl.addEventListener('click', onDelete);
-        textareaEl.setAttribute("placeholder", "Make some notes!");
 
         barEl.appendChild(saveBtnEl);
         barEl.appendChild(deleteBtnEl);
         stickerEl.appendChild(barEl);
         stickerEl.appendChild(textareaEl);
+        textareaEl.setAttribute('placeholder','Make some notes!');
 
         document.body.appendChild(stickerEl);
     }
